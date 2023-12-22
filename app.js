@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 dotenv.config({ path: './.env' });
 
@@ -31,6 +33,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware to parse URL-encoded and JSON request bodies
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Route to handle authentication (assuming it's defined in './routes/auth')
 app.use('/auth', require('./routes/auth'));
@@ -53,6 +56,32 @@ app.get('/', (req, res) => {
     log(req, res);
 });
 
+app.get('/dashboard', (req, res) => {
+    // Retrieve the JWT token from the request cookies
+    const token = req.cookies.jwt;
+    console.log(token);
+
+    // Verify the JWT token
+    jwt.verify(token,  process.env.JWT_SECRET, (err, decodedToken) => {
+        if (err) {
+            // Token is invalid, handle accordingly (e.g., redirect to login)
+            return res.redirect('/login-register');
+        } else {
+            // Token is valid, you can access user information in decodedToken
+            console.log(decodedToken);
+            const userId = decodedToken.userId;
+            const username = decodedToken.username;
+
+            // Render 'dashboard.ejs' and pass user information or perform actions
+            res.render('dashboard', { userId, username });
+            console.log(userId);
+            console.log(username);
+        }
+    });
+
+    // Log the request details
+    log(req, res);
+});
 app.get('/login-register', (req, res) => {
     // Render 'login-register.ejs' from the 'views' folder
     res.render('login-register');

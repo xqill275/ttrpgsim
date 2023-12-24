@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const { use } = require('./routes/auth');
 
 dotenv.config({ path: './.env' });
 
@@ -38,6 +39,8 @@ app.use(cookieParser());
 // Route to handle authentication (assuming it's defined in './routes/auth')
 app.use('/auth', require('./routes/auth'));
 
+app.use('/campaign', require('./routes/campaign'));
+
 // Listen for requests on port 3000
 app.listen(3000, () => {
     console.log('Listening for requests on port 3000');
@@ -50,8 +53,27 @@ function log(req, res) {
 
 // Handle GET requests for the root URL
 app.get('/', (req, res) => {
+    const token = req.cookies.jwt;
+    var username;
+    if (token != undefined) {
+        loggedIn = true;
+        jwt.verify(token,  process.env.JWT_SECRET, (err, decodedToken) => {
+            if (err) {
+                return res.redirect('/');
+            } else {
+                console.log("we are here")
+                return username = decodedToken.UserName;
+                console.log(username);
+            }
+        }
+        );
+    } else {
+        loggedIn = false;
+        username = '';
+    }
+    console.log(username);
     // Render 'index.ejs' from the 'views' folder
-    res.render('index');
+    res.render('index', { loggedIn, username });
     // Log the request details
     log(req, res);
 });
@@ -70,7 +92,7 @@ app.get('/dashboard', (req, res) => {
             // Token is valid, you can access user information in decodedToken
             console.log(decodedToken);
             const userId = decodedToken.userId;
-            const username = decodedToken.username;
+            const username = decodedToken.UserName;
 
             // Render 'dashboard.ejs' and pass user information or perform actions
             res.render('dashboard', { userId, username });

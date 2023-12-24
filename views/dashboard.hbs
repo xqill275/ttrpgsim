@@ -6,18 +6,48 @@
     <title>User Dashboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f5f5f5;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        nav {
+            background-color: #555;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+            transition: color 0.3s ease-in-out;
+        }
+
+        nav a:hover {
+            color: #ddd;
         }
 
         .dashboard-container {
             max-width: 800px;
+            width: 100%;
+            margin: 20px;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
@@ -27,6 +57,7 @@
         h2 {
             color: #333;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         .welcome-message {
@@ -34,6 +65,80 @@
             margin-bottom: 20px;
         }
 
+        .campaigns-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .campaign {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            transition: transform 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .campaign:hover {
+            transform: scale(1.02);
+        }
+
+        .campaign p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .campaign-buttons {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .campaign-buttons button {
+            background-color: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .campaign-buttons button:hover {
+            background-color: #555;
+        }
+
+        .new-campaign-form {
+            margin-top: 20px;
+            text-align: center;
+            display: none; /* Initially hide the form */
+        }
+
+        .new-campaign-form label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .new-campaign-form input,
+        .new-campaign-form textarea,
+        .new-campaign-form select {
+            display: block;
+            margin: 10px auto;
+            padding: 8px;
+            width: 80%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .new-campaign-btn,
+        .toggle-form-btn,
         .logout-btn {
             background-color: #333;
             color: #fff;
@@ -41,17 +146,39 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            display: block;
-            margin: auto;
-            margin-top: 20px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease-in-out;
         }
 
+        .new-campaign-btn:hover,
+        .toggle-form-btn:hover,
         .logout-btn:hover {
             background-color: #555;
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .message p {
+            color: #333;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
+
+    <header>
+        TTRPG Dashboard
+    </header>
+
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="#characters">Characters</a>
+        <a href="#campaigns">Campaigns</a>
+        <a href="/auth/logout" class="logout-btn">Logout</a>
+    </nav>
 
     <div class="dashboard-container">
         <h2>Welcome to Your Dashboard</h2>
@@ -60,15 +187,137 @@
             <p>Hello, {{ username }}!</p>
         </div>
 
-        <!-- Add your dashboard content and features here -->
+        <div class="campaigns-container">
+            <h3>Your Campaigns</h3>
+            <!-- Iterate over user campaigns and display them -->
+            {{#each campaigns}}
+                <div class="campaign">
+                    <p>Campaign Name: {{ this.campaign_name }}</p>
+                    <p>Description: {{ this.campaign_description }}</p>
+                    <p>System: {{ this.campaign_system }}</p>
+                    <p>Start Date: {{ this.campaign_date }}</p>
+                    <p>Campaign ID: {{ this.campaign_id }}</p>
+                    <div class="campaign-buttons">
+                        <button class="delete-campaign-btn" onclick="deleteCampaign({{ this.campaign_id }})">Delete Campaign</button>
+                        <button class="edit-campaign-btn" onclick="editCampaign({{ this.campaign_id }})">Edit Campaign</button>
+                        <button class="join-campaign-btn" onclick="joinCampaign({{ this.campaign_id }})">Join Campaign</button>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
 
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="new-campaign-form">
+            <div class="message">
+                <p></p>
+            </div>
+            <h3>Create a New Campaign</h3>
+            <form action="/campaign/create-campaign" method="post">
+                <label for="campaignName">Campaign Name:</label>
+                <input type="text" id="campaignName" name="campaignName" placeholder="Campaign Name" required>
+
+                <label for="campaignDescription">Campaign Description:</label>
+                <textarea id="campaignDescription" name="campaignDescription" placeholder="Campaign Description" required></textarea>
+
+                <!-- Add a dropdown for Campaign System -->
+                <label for="campaignSystem">Campaign System:</label>
+                <select id="campaignSystem" name="campaignSystem" required>
+                    <option value="dnd5e">DND 5e</option>
+                    <option value="blades">Blades in the Dark</option>
+                    <!-- Add more options as needed -->
+                </select>
+
+                <label for="campaignStartDate">Campaign Start Date:</label>
+                <input type="date" id="campaignStartDate" name="campaignStartDate" required>
+                <!-- Add more fields as needed -->
+
+                <button type="submit" class="new-campaign-btn">Create Campaign</button>
+            </form>
+        </div>
+
+        <button class="toggle-form-btn" onclick="toggleForm()">Create New Campaign</button>
     </div>
 
     <script>
-        function logout() {
-            alert('Logout successful'); // Replace this with actual logout logic
+        var campaignId = [];
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/campaign/get-campaigns');
+                console.log(response);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch campaigns: ${response.status}`);
+                }
+
+                const campaigns = await response.json();
+
+                if (campaigns.length > 0) {
+                    const campaignsContainer = document.querySelector('.campaigns-container');
+
+                    campaigns.forEach(campaign => {
+                        const campaignElement = document.createElement('div');
+                        campaignElement.classList.add('campaign');
+
+                        var date = new Date(campaign.campaign_date);
+                        const formattedStartDate = date.toLocaleDateString();
+                        campaignElement.innerHTML = `
+                            <p>Campaign Name: ${campaign.campaign_name}</p>
+                            <p>Description: ${campaign.campaign_description}</p>
+                            <p>System: ${campaign.campaign_system}</p>
+                            <p>Start Date: ${formattedStartDate}</p>
+                            <p>Campaign ID: ${campaign.campaign_id}</p>
+                            <div class="campaign-buttons">
+                                <button class="delete-campaign-btn" onclick="deleteCampaign(${campaign.campaign_id})">Delete Campaign</button>
+                                <button class="edit-campaign-btn" onclick="editCampaign(${campaign.campaign_id})">Edit Campaign</button>
+                                <button class="join-campaign-btn" onclick="joinCampaign(${campaign.campaign_id})">Join Campaign</button>
+                            </div>
+                        `;
+
+                        campaignsContainer.appendChild(campaignElement);
+                    });
+                } else {
+                    console.log('No campaigns found.');
+                }
+            } catch (error) {
+                console.error('Error fetching campaigns:', error.message);
+            }
+        });
+
+        function toggleForm() {
+            const btn = document.querySelector('.toggle-form-btn');
+            const form = document.querySelector('.new-campaign-form');
+            if (btn.innerText === 'Create New Campaign') {
+                btn.innerText = 'Create New Campaign';
+            } else {
+                btn.innerText = 'Hide Form';
+            }
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
+
+        function deleteCampaign(id) {
+            fetch('/campaign/delete-campaign', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ campaignId: id })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    throw new Error(`Failed to delete campaign: ${response.status}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting campaign:', error.message);
+            });
+        }
+
+        {{#if message}}
+            <script>
+                document.querySelector('.message p').innerHTML = "{{message}}";
+            </script>
+        {{/if}}
     </script>
 
 </body>

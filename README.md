@@ -1,1 +1,56 @@
-# ttrpgsim
+# Project Roadmap
+
+## User Authentication System:
+- [x] User registration
+- [x] Login functionality
+
+## Campaign Management:
+- [x] Ability for users to create, join, and manage campaigns.
+- [x] Campaign details such as name, description, system, start date, etc.
+- [ ] Campaign forums or chat for communication among players.
+
+## Character Management:
+- [ ] Character creation and editing tools.
+- [ ] Character sheets and stat tracking.
+- [ ] Integration with the campaign (characters associated with campaigns).
+
+## Play Screen:
+- [ ] Virtual game board or map.
+- [ ] Chat functionality for real-time communication during gameplay.
+- [ ] Integration of character sheets and relevant game information.
+
+## Responsive Design:
+- [ ] Ensure the website is mobile-friendly for users on different devices.
+
+## Navigation:
+- [ ] Clear navigation menu for easy access to different sections of the site.
+
+## Homepage:
+- [ ] Overview of featured or active campaigns.
+- [ ] Quick links to essential sections (campaigns, characters, play, etc.).
+
+## Security Measures:
+- [ ] Protection against common web vulnerabilities (e.g., SQL injection, XSS).
+- [ ] Secure password storage (use encryption and hashing).
+
+## Terms of Service and Privacy Policy:
+- [ ] Clearly define terms of use and privacy policies for users.
+
+## Scalability:
+- [ ] Design your system to scale as your user base grows.
+
+## Performance Optimization:
+- [ ] Optimize website performance for faster loading times.
+
+## Backup and Recovery:
+- [ ] Implement regular data backups and have a recovery plan in place.
+
+## Legal Considerations:
+- [ ] Ensure you have the right to use and display any third-party content (images, etc.).
+- [ ] Comply with legal requirements related to user data and privacy.
+
+## Feedback Mechanism:
+- [ ] Provide a way for users to give feedback and report issues.
+
+## Documentation:
+- [ ] Create user documentation to guide users on how to use the website.
